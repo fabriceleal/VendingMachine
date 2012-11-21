@@ -42,4 +42,10 @@ I had to comment lines 98 to 101 of `libgraph.c`:
     }
 ```
 
+### Ops
+
+Just noticed that part of the code might be "missing" ...
+Was this really a final version?
+
+
 
