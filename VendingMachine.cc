@@ -1,13 +1,16 @@
-#include <iostream.h>
+#include <iostream>
 #include <stdio.h>
-#include <conio.h>
 #include <graphics.h>
+//#include "conio.h"
 #include <string.h>
 #include <math.h>
 
 enum tecla { ANTERIOR=45/*(-)*/, SEGUINTE=43 /*(+)*/, ENTER=13,ESCAPE=27,BACKSPACE=8 ,TAB=9};
 enum luz { NADA, CIMA_DIREITA, CIMA_ESQUERDA, BAIXO_DIREITA, BAIXO_ESQUERDA};
-enum bool {FALSO, VERDADEIRO};
+
+// bool is already defined
+//enum bool {FALSO, VERDADEIRO};
+
 enum input_type {BOTAO,CAIXA};
 enum val {INTEIROS, LETRAS, ALFANUMERICOS, DECIMAIS,ASCIICHAR };
 /*
@@ -97,6 +100,10 @@ int menuADM();
 void produtosADMNISTRADOR(int Nprodutos);
 void moedasADMNISTRADOR(int Nmoedas);
 
+#define DEFAULT_FONT 0
+#define HORIZ_DIR 0
+void settextstyle(int font, int direction, int charsize);
+void clrscr();
 
 class linha
 {
@@ -396,7 +403,7 @@ class quadrilatero_relevo : public quadrilatero
 		calcula_linhas();
 		espessura = ESPESSURA; direccao_luz = DIRECCAO_LUZ   ;
 	}
-	void desenha_me(int COR_BORDA, int COR_INTERNA, bool PINTA_INTERIOR=VERDADEIRO)
+	void desenha_me(int COR_BORDA, int COR_INTERNA, bool PINTA_INTERIOR=true)
 	{
 		int ContY;
 		if (getcolor()!=COR_INTERNA)
@@ -495,7 +502,7 @@ class botao_opcao
 		cor_texto = COR_TEXTO;
 		cor_textoS = COR_TEXTOS;
 	}
-	void desenha_me(bool SELECCIONADO=FALSO)
+	void desenha_me(bool SELECCIONADO=false)
 	{
 		int CorBotao, CorBorda, CorTexto;
 		if (SELECCIONADO)
@@ -530,10 +537,10 @@ class caixa_texto
 	int cor_legenda, cor_legendaS;
 	int cor_texto;
 	ponto posicao_escrita;
-	bool passwordchar; //verdadeiro para escrever * em vez dos caracteres reais
+	bool passwordchar; //true para escrever * em vez dos caracteres reais
 	val valores; //tipo de caracteres q reconhece
 	quadrilatero_relevo grafico;
-	caixa_texto(char TEXTO[]="CAIXA", int X1=0, int Y1=0, int ALTURA=20, int LARGURA=50, luz DIRECCAO_LUZ=NADA, int ESPESSURA=0 , int MAX_CARACTERES=0, bool PASS=FALSO, int COR_CAIXA=DARKGRAY, int COR_BORDACAIXA=WHITE, int  COR_BORDACAIXAS=RED , int COR_LEGENDA=WHITE, int COR_LEGENDAS = RED , int COR_TEXTO=WHITE , int TAMANHO=1): grafico(X1,Y1, ALTURA, LARGURA, ESPESSURA, DIRECCAO_LUZ)
+	caixa_texto(char TEXTO[]="CAIXA", int X1=0, int Y1=0, int ALTURA=20, int LARGURA=50, luz DIRECCAO_LUZ=NADA, int ESPESSURA=0 , int MAX_CARACTERES=0, bool PASS=false, int COR_CAIXA=DARKGRAY, int COR_BORDACAIXA=WHITE, int  COR_BORDACAIXAS=RED , int COR_LEGENDA=WHITE, int COR_LEGENDAS = RED , int COR_TEXTO=WHITE , int TAMANHO=1): grafico(X1,Y1, ALTURA, LARGURA, ESPESSURA, DIRECCAO_LUZ)
 	{
 
 		int Altura = grafico.pt3.y - grafico.pt1.y, Largura = grafico.pt2.x - grafico.pt1.x;
@@ -591,7 +598,7 @@ class caixa_texto
 		cor_caixa = NAT;
 		cor_bordacaixa = BOR_NAT; cor_bordacaixaS = BOR_SEL;
 	}
-	void redefine_propriedades(char * NOVOTEXTO, val VALORES=LETRAS, bool PASS=FALSO)
+	void redefine_propriedades(char * NOVOTEXTO, val VALORES=LETRAS, bool PASS=false)
 	{
 		texto = NOVOTEXTO;
 		passwordchar = PASS;
@@ -607,49 +614,49 @@ class caixa_texto
 		max_caracteres = Largura/textwidth("M");
 	}
 	bool is_val(int CODIGO, val TIPO_VALOR)
-	/*devolve verdadeiro se um caracter for do tipo passado no parametro*/
+	/*devolve true se um caracter for do tipo passado no parametro*/
 	{
 		switch(TIPO_VALOR)
 		{
 			case (INTEIROS):
 				if (CODIGO>=48 && CODIGO<=57)
-					return (VERDADEIRO);
+					return (true);
 				else
-					return (FALSO);
+					return (false);
 			case (LETRAS):
 				if ((CODIGO>=65 && CODIGO<=90) || (CODIGO>=97 && CODIGO<=122))
-					return (VERDADEIRO);
+					return (true);
 				else
-					return (FALSO);
+					return (false);
 			case (ALFANUMERICOS):
 				if (is_val(CODIGO,INTEIROS) || is_val(CODIGO,LETRAS))
-					return (VERDADEIRO);
+					return (true);
 				else
-					return (FALSO);
+					return (false);
 			case (DECIMAIS):
 				if (is_val(CODIGO, INTEIROS))
-					return (VERDADEIRO);
+					return (true);
 				if	(CODIGO==46)
 				{
 					//tem de ver s j  h  ponto no conteudo; s¢ admite 1 ponto!
 					for (int x=0; conteudo[x]!='\0'; x++)
 						if (conteudo[x]==46)
-							return (FALSO);
-					return (VERDADEIRO);
+							return (false);
+					return (true);
 				}
-				return (FALSO);
+				return (false);
 			case (ASCIICHAR):
 				if (is_val(CODIGO, ALFANUMERICOS) || (CODIGO==95) || (CODIGO==32) || (CODIGO==124) || (CODIGO==38)) // '_' ;; ' ' ;; '|' ;; '&'
-					return (VERDADEIRO);
+					return (true);
 				else
-					return (FALSO);
+					return (false);
 		}
-		return(FALSO);
+		return(false);
 	}
 	bool permite(int CODIGO)
 	{
 		if (CODIGO==BACKSPACE)
-			return (VERDADEIRO); //Backspace serve para apagar
+			return (true); //Backspace serve para apagar
 		return (is_val(CODIGO, valores));
 	}
 	void escreve(int CODIGO)
@@ -681,7 +688,7 @@ class caixa_texto
 			conteudo[letra]='\0';
 		}
 	}
-	void desenha_me(bool SELECCIONADO=FALSO, bool INTERIOR=FALSO)
+	void desenha_me(bool SELECCIONADO=false, bool INTERIOR=false)
 	{
 		int CorCaixa, CorBorda, CorTexto;
 		if (SELECCIONADO)
@@ -765,7 +772,7 @@ class menu
 		}
 		return(-1);
 	}
-	void desenha_opcao_seleccionada(bool FOCO=VERDADEIRO)
+	void desenha_opcao_seleccionada(bool FOCO=true)
 	{
 		int N = ncontrolo(listacontrolos[opcao_seleccionada],opcao_seleccionada);
 		switch( listacontrolos[opcao_seleccionada] )
@@ -780,7 +787,7 @@ class menu
 	}
 	void muda_opcao_seleccionada(tecla CODIGO)
 	{
-		desenha_opcao_seleccionada(FALSO);
+		desenha_opcao_seleccionada(false);
 		if (CODIGO==ANTERIOR)
 		{
 			if (opcao_seleccionada==0)
@@ -834,7 +841,7 @@ class menu
 		for (x=0;x<ncontrolos;x++)
 		{
 			if (listacontrolos[x]==CAIXA)
-			{	listacaixas[c].desenha_me(FALSO,VERDADEIRO);
+			{	listacaixas[c].desenha_me(false,true);
 				c++;
 			}
 			if (listacontrolos[x]==BOTAO)
@@ -879,7 +886,7 @@ class moeda
 produto listaprodutos[7];
 moeda listamoedas[6];
 
-void main()
+int main()
 {
 	clrscr();
 	int gdriver = DETECT, gmode, errorcode;
@@ -961,6 +968,7 @@ void main()
 	}
 	while(OPCAO1);
 	closegraph();
+	return 0;
 }
 
 int menuINICIAR()
@@ -1004,7 +1012,7 @@ int menuLOGINADM()
 	menuLADM.define_ordem_controlos(0,CAIXA);
 		menuLADM.listacaixas[0].redefine_propriedades("Login",ASCIICHAR);
 	menuLADM.define_ordem_controlos(1,CAIXA);
-		menuLADM.listacaixas[1].redefine_propriedades("Password",ASCIICHAR,VERDADEIRO);
+		menuLADM.listacaixas[1].redefine_propriedades("Password",ASCIICHAR,true);
 	menuLADM.define_ordem_controlos(2,BOTAO);
 		menuLADM.listabotoes[0].texto = "Entrar";
 	menuLADM.define_ordem_controlos(3,BOTAO);
@@ -1412,4 +1420,12 @@ int nalgarismos(int NUMERO)
 		Cntador++;
 	} while (NUMERO>0);
 	return(Cntador);
+}
+
+void clrscr() {
+	// Do nothing ...
+}
+
+void settextstyle(int font, int direction, int charsize) {
+	// Do nothing ...
 }
